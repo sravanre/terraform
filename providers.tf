@@ -1,14 +1,13 @@
-provider "aws" {
-  profile = var.profile
-  region  = var.region-master
-  alias   = "region-master"
-
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
 }
 
+# Configure the AWS Provider
 provider "aws" {
-  profile = var.profile
-  region  = var.region-worker
-  alias   = "region-worker"
-
+  region = "us-east-1"
 }
-
