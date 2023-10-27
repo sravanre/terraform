@@ -4,5 +4,6 @@ terraform.tfstate
 terraform.tfstate.backup
 *.txt
 *.pdf
+.terraform/*
 
 
