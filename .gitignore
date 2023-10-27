@@ -3,5 +3,6 @@ aws-ec2-demo.pub
 terraform.tfstate
 terraform.tfstate.backup
 *.txt
+*.pdf
 
 

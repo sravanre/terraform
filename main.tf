@@ -140,15 +140,25 @@ resource "aws_security_group" "ec2-instance-sg" {
 # Create an EC2 instance in the public subnet with user data
 resource "aws_instance" "web_server" {
   ami                         = data.aws_ami.latest_ubuntu_22.id
-  instance_type               = "t2.micro"
+  instance_type               = "t3.medium"
   subnet_id                   = aws_subnet.public_subnet_1a.id
   key_name                    = aws_key_pair.my_key.key_name # Replace with your SSH key pair name
   associate_public_ip_address = true
   security_groups = [ "${aws_security_group.ec2-instance-sg.id}" ]
   user_data                   = <<-EOF
     #!/bin/bash
-    echo "Hello from the user data script" > /home/ubuntu/apache_installation.txt
-    # Add your Apache installation script here
+    
+    wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key |sudo gpg --dearmor -o /usr/share/keyrings/jenkins.gpg
+    sudo sh -c 'echo deb [signed-by=/usr/share/keyrings/jenkins.gpg] http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+    apt-get update -y
+    sudo apt install -y openjdk-11-jdk
+    sudo apt install jenkins -y 
+    sudo systemctl start jenkins.service
+    sudo systemctl enable jenkins.service
+    sudo ufw allow 8080
+
+
+
   EOF
 
   tags = {
