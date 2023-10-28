@@ -128,6 +128,13 @@ resource "aws_security_group" "ec2-instance-sg" {
     cidr_blocks = ["${var.my_ip_address}"]   # so that only i can access from my network, 
   }
 
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["${var.my_ip_address}"]   # so that only i can access from my network, 
+  }
+
   # Egress rule for internet access
   egress {
     from_port   = 0
@@ -147,17 +154,17 @@ resource "aws_instance" "web_server" {
   security_groups = [ "${aws_security_group.ec2-instance-sg.id}" ]
   user_data                   = <<-EOF
     #!/bin/bash
-    
-    wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key |sudo gpg --dearmor -o /usr/share/keyrings/jenkins.gpg
-    sudo sh -c 'echo deb [signed-by=/usr/share/keyrings/jenkins.gpg] http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
-    apt-get update -y
-    sudo apt install -y openjdk-11-jdk
-    sudo apt install jenkins -y 
+    sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
+    https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+    echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+    https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+    /etc/apt/sources.list.d/jenkins.list > /dev/null
+    sudo apt-get update 
+    sudo apt install openjdk-11-jre -y 
+    sudo apt-get install jenkins -y 
     sudo systemctl start jenkins.service
     sudo systemctl enable jenkins.service
     sudo ufw allow 8080
-
-
 
   EOF
 
