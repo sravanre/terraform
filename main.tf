@@ -110,8 +110,8 @@ data "aws_ami" "latest_ubuntu_22" {
 }
 
 resource "aws_key_pair" "my_key" {
-  key_name   = "aws-ec2-demo"  # Replace with your key name
-  public_key = file("aws-ec2-demo.pub")  # Replace with your public key file path
+  key_name   = "aws-ec2-demo"           # Replace with your key name
+  public_key = file("aws-ec2-demo.pub") # Replace with your public key file path
 }
 
 # Create a security group allowing SSH from 0.0.0.0/0 and egress for internet access
@@ -125,14 +125,14 @@ resource "aws_security_group" "ec2-instance-sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["${var.my_ip_address}"]   # so that only i can access from my network, 
+    cidr_blocks = ["${var.my_ip_address}"] # so that only i can access from my network, 
   }
 
   ingress {
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
-    cidr_blocks = ["${var.my_ip_address}"]   # so that only i can access from my network, 
+    cidr_blocks = ["${var.my_ip_address}"] # so that only i can access from my network, 
   }
 
   # Egress rule for internet access
@@ -151,7 +151,7 @@ resource "aws_instance" "web_server" {
   subnet_id                   = aws_subnet.public_subnet_1a.id
   key_name                    = aws_key_pair.my_key.key_name # Replace with your SSH key pair name
   associate_public_ip_address = true
-  security_groups = [ "${aws_security_group.ec2-instance-sg.id}" ]
+  security_groups             = ["${aws_security_group.ec2-instance-sg.id}"]
   user_data                   = <<-EOF
     #!/bin/bash
     sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
@@ -180,11 +180,11 @@ resource "aws_security_group" "ec2-instance-sg2" {
 
   # Ingress rule for SSH
   ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
     security_groups = [aws_security_group.ec2-instance-sg.id]
-       # so that only i can access from my network, 
+    # so that only i can access from my network, 
   }
 
   # Egress rule for internet access
@@ -203,7 +203,7 @@ resource "aws_instance" "web_server-2" {
   subnet_id                   = aws_subnet.private_subnet_1c.id
   key_name                    = aws_key_pair.my_key.key_name # Replace with your SSH key pair name
   associate_public_ip_address = false
-  security_groups = [ "${aws_security_group.ec2-instance-sg2.id}" ]
+  security_groups             = ["${aws_security_group.ec2-instance-sg2.id}"]
   user_data                   = <<-EOF
     #!/bin/bash
     echo "Hello from the user data script from the server private for db" > /home/ubuntu/apache_installation.txt
