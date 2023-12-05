@@ -135,6 +135,13 @@ resource "aws_security_group" "ec2-instance-sg" {
     cidr_blocks = ["${var.my_ip_address}"]   # so that only i can access from my network, 
   }
 
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["${var.my_ip_address}"]   # so that only i can access from my network, 
+  }
+
   # Egress rule for internet access
   egress {
     from_port   = 0
@@ -165,6 +172,9 @@ resource "aws_instance" "web_server" {
     sudo systemctl start jenkins.service
     sudo systemctl enable jenkins.service
     sudo ufw allow 8080
+    sudo apt install apache2 -y
+    sudo systemctl start apache2 
+    sudo systemctl enable apache2
 
   EOF
 
